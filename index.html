@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="/socket.io/socket.io.js"></script>
+
+</head>
+<body>
+
+<ul id="messages">
+
+
+</ul>
+
+
+    <form id="nameform">
+        <label for="">Type your name</label>
+<input type="text"> <br><br>
+<button type="submit">send</button> </form> 
+
+    <form id="msgform">
+        <label for="">Type your message</label>
+<input type="text"> <br><br>
+<button type="submit">send</button>
+
+    </form>
+    <script>
+        const msgform=document.getElementById("msgform")
+        msgform.hidden=true;
+        const messages=document.getElementById("messages")
+        const nameform=document.getElementById("nameform")
+        const socket = io();
+        
+        socket.on("receive_msg",(msg,name)=>{
+            displayMessage(msg,name)
+        })
+
+socket.on('getName',()=>{
+
+    nameform.addEventListener('submit',(e)=>{e.preventDefault();
+    const name=nameform[0].value;
+            if(!name) return;
+    socket.emit("setName",name,()=>{
+       msgform.hidden=false;
+       nameform.hidden=true;
+    
+
+    })
+
+})
+})
+
+
+        msgform.addEventListener('submit',(e)=>{e.preventDefault();
+            const msg=msgform[0].value;
+            if(!msg) return;
+            socket.emit("new_message", msg, ()=>{
+                displayMessage(msg, "You")
+                msgform[0].value="";
+            })
+        })
+
+
+        function displayMessage(msg, name) {
+            const li=document.createElement('li')
+            li.textContent=name + " : " + msg;
+            messages.appendChild(li)
+        }
+        </script>
+</body>
+</html>
